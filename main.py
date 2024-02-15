@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, Form, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, Form, HTTPException, Request, WebSocket, WebSocketDisconnect
 import face_recognition
 import cv2
 import os 
@@ -221,19 +221,41 @@ async def login(
     else:
         raise HTTPException(status_code=404,detail="user not found")    
 
-websocket_manager = WebSocketManager()
+#websocket_manager = WebSocketManager()
 
-@app.websocket("/ws/{voter_id}")
-async def websocket_endpoint(websocket: WebSocket, voter_id: str):
-    await websocket.accept()
-    await websocket_manager.register(websocket)
+#@app.websocket("/ws/{voter_id}")
+#async def websocket_endpoint(websocket: WebSocket, voter_id: str):
+ #   await websocket.accept()
+  #  await websocket_manager.register(websocket)
 
-    try:
-        while True:
-            # Handle incoming WebSocket messages if need
-            data = await websocket.receive_text()
-            print(f"Received message from {voter_id}: {data}")
-    except Exception as e:
-        print(f"WebSocket connection closed with error: {e}")
-    finally:
-        await websocket_manager.unregister(websocket)
+   # try:
+      #  while True:
+       #     # Handle incoming WebSocket messages if need
+       #     data = await websocket.receive_text()
+        #    print(f"Received message from {voter_id}: {data}")
+    #except Exception as e:
+     #   print(f"WebSocket connection closed with error: {e}")
+    #finally:
+     #   await websocket_manager.unregister(websocket)
+    # Route to handle vote submission
+@app.post("/vote", response_class=HTMLResponse)
+async def vote(voter_id: int = Form(...), db: Session = Depends(get_db)):
+    # Check if the user has already voted
+    user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
+    if user:
+        if user.voted:
+            raise HTTPException(status_code=400, detail="You have already voted")
+        else:
+            # Update the user status to indicate that they have voted
+            user.voted = True
+            db.commit()
+            return {"message": "Vote submitted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+# Route to render the dashboard HTML
+@app.get("/dashboard", response_class=HTMLResponse)
+async def render_dashboard(request: Request):
+    # Read the HTML file and return its content
+    with open("dashboard.html", "r") as file:
+        html_content = file.read()
+    return HTMLResponse(content=html_content, status_code=200)
