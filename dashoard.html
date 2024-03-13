@@ -1,96 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        #user-info {
-            flex: 1;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        #buttons {
-            flex: 1;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: #f0f0f0;
-        }
-        .button1 {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-align: center;
-            background-color:#FFA500;
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .button1:hover {
-            background-color: #FF8C00;
-        }
-        .button2 {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-align: center;
-            background-color:hsl(199, 100%, 50%);
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .button2:hover {
-            background-color: #00008b;
-        }
-        .button3{
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-align: center;
-            background-color:hwb(138 25% 10%);
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-
-        }
-        .button3:hover{
-            background-color: #31c038;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
 </head>
 <body>
     <div id="user-info">
-        <h2>User Information</h2>
-        <p>Voter ID: {{ voter_id }}</p>
-        <p>Status: {{ user_status }}</p>
-        <!-- Add more user information here as needed -->
+        <h1>User Dashboard</h1>
+        <p>Loading user information...</p>
     </div>
-    <div id="buttons">
-        <h2>Vote for a Party</h2>
-        {% if user_status == 'Unvoted' %}
-        <form id="vote-form" action="/vote" method="post">
-            <input type="hidden" name="voter_id" value="{{ voter_id }}">
-            <button class="button1" type="submit">Vote for BJP Party</button>
-            <button class="button2" type="submit">Vote for Congress Party</button>
-            <button class="button3" type="submit">Vote for Others</button>
-        </form>
-        {% else %}
-        <p>You have already voted.</p>
-        {% endif %}
-        <!-- Add more buttons for different parties -->
-    </div>
+
+    <script>
+        // Fetch user information from the backend
+        fetch('/dashboard/{5025025024}')
+            .then(response => response.json())
+            .then(data => {
+                // Extract user information from the response
+                const { user } = data;
+
+                // Update the user-info div with the user's information
+                document.getElementById('user-info').innerHTML = `
+                    <h1>Welcome, ${user.name}</h1>
+                    <p>Voter ID: ${user.voter_id}</p>
+                    <p>Status: ${user.status}</p>
+                    <!-- Add any other user information here -->
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching user information:', error);
+                document.getElementById('user-info').innerHTML = '<p>Error fetching user information. Please try again later.</p>';
+            });
+    </script>
 </body>
 </html>
-
