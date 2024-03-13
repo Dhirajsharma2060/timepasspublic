@@ -1,8 +1,10 @@
-from fastapi import Depends, FastAPI, Form, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, Form, HTTPException, Request, WebSocket, WebSocketDisconnect, requests
 import face_recognition
 import cv2
 import os 
 from dotenv import load_dotenv
+#from fastapi.templating import TemplateResponse
+from jinja2 import Template
 from passlib.context import CryptContext
 from database import SessionLocal, engine
 from test import test_conn
@@ -10,7 +12,7 @@ from sqlalchemy.orm import Session
 from models import Voter
 from connect import connect
 from fastapi import FastAPI, Depends, WebSocket
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from websocket_manager import WebSocketManager
 import models
 models.Base.metadata.create_all(bind=engine)
@@ -220,42 +222,25 @@ async def login(
             raise HTTPException(status_code=401, detail="Face recognition failed")
     else:
         raise HTTPException(status_code=404,detail="user not found")    
-
-#websocket_manager = WebSocketManager()
-
-#@app.websocket("/ws/{voter_id}")
-#async def websocket_endpoint(websocket: WebSocket, voter_id: str):
- #   await websocket.accept()
-  #  await websocket_manager.register(websocket)
-
-   # try:
-      #  while True:
-       #     # Handle incoming WebSocket messages if need
-       #     data = await websocket.receive_text()
-        #    print(f"Received message from {voter_id}: {data}")
-    #except Exception as e:
-     #   print(f"WebSocket connection closed with error: {e}")
-    #finally:
-     #   await websocket_manager.unregister(websocket)
-    # Route to handle vote submission
-@app.post("/vote", response_class=HTMLResponse)
-async def vote(voter_id: int = Form(...), db: Session = Depends(get_db)):
-    # Check if the user has already voted
+# Dashboard endpoint
+@app.get("/dashboard/{voter_id}")
+async def dashboard(voter_id: int, db: Session = Depends(get_db)):
+    # Query the database to retrieve user information based on voter_id
     user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
-    if user:
-        if user.voted:
-            raise HTTPException(status_code=400, detail="You have already voted")
-        else:
-            # Update the user status to indicate that they have voted
-            user.voted = True
-            db.commit()
-            return {"message": "Vote submitted successfully"}
-    else:
+
+    # Check if the user exists
+    if not user:
         raise HTTPException(status_code=404, detail="User not found")
-# Route to render the dashboard HTML
-@app.get("/dashboard", response_class=HTMLResponse)
-async def render_dashboard(request: Request):
-    # Read the HTML file and return its content
-    with open("dashboard.html", "r") as file:
-        html_content = file.read()
-    return HTMLResponse(content=html_content, status_code=200)
+
+    # Determine the voting status message based on the user's status
+    voting_status = "Voted" if user.status else "Not Voted"
+
+    # Return all user information including voting status
+    return {
+        "user": {
+            "voter_id": user.voter_id,
+            "name": user.name,
+            "status": voting_status,
+            # Include any other relevant user information here
+        }
+    }
