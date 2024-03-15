@@ -1,10 +1,10 @@
 # Ignore compiled Python files
-*.pyc
+#*.pyc
 
 # Ignore virtual environment folder
-venv/
+#venv/
 
 # Ignore the .env file containing sensitive information
-.env
+#.env
 # Ignore imageref folder 
-imageref/
+#imageref/

@@ -13,7 +13,7 @@ from models import Voter
 from connect import connect
 from fastapi import FastAPI, Depends, WebSocket
 from fastapi.responses import FileResponse, HTMLResponse
-from websocket_manager import WebSocketManager
+#from websocket_manager import WebSocketManager
 import models
 models.Base.metadata.create_all(bind=engine)
 load_dotenv()
