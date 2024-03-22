@@ -1,3 +1,4 @@
+from re import template
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, WebSocket, WebSocketDisconnect, requests
 import face_recognition
 import cv2
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session
 from models import Voter
 from connect import connect
 from fastapi import FastAPI, Depends, WebSocket
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 #from websocket_manager import WebSocketManager
 import models
 models.Base.metadata.create_all(bind=engine)
@@ -181,7 +182,10 @@ async def register(
         # You may want to insert the face_encoding into another table
 
         # Return a success message
-        return {"message": f"Successfully registered voter: {voter_Id}"}
+        print("Redirecting to login page...")
+        return RedirectResponse("http://127.0.0.1:5500/login.html")
+        
+    
 
     except Exception as e:
         # Handle any exceptions (e.g., database errors)
@@ -215,7 +219,7 @@ async def login(
         if recognize_face(voter_Id):
             #so here the if condition it will check the user enter pasword and the password that is stored in the database
             if pwd_context.verify(password,user_data.password):
-                return {"message": f"{voter_Id} successfully logged in"}
+                return RedirectResponse(url=f"/dashboard/{voter_Id}")
             else:
                 raise HTTPException(status_code=401,detail="incorrect password please check")
         else:
