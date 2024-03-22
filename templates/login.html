@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script>
+        function validateVoterID() {
+            var voterID = document.getElementById("voter_Id").value;
+
+            if (!isNaN(voterID) && voterID.length === 10) {
+                alert("Valid voter ID!");
+                return true;
+            } else {
+                alert("Invalid voter ID! Please enter a 10-digit numeric ID.");
+                return false;
+            }
+        }
+
+        function validateLoginForm() {
+            var voterId = document.getElementById("voter_Id").value;
+            var password = document.getElementById("password").value;
+
+            if (voterId.length !== 10) {
+                alert("Invalid voter ID! Voter ID should be 10 characters long.");
+                return false;
+            }
+
+            // You can add more validation checks for the password if needed
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>Login</h1>
+    <form action="http://127.0.0.1:8000/login" method="post" onsubmit="return validateLoginForm()">
+        <label for="voter_Id">Voter ID:</label>
+        <input type="text" id="voter_Id" name="voter_Id" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <input type="submit" value="Login">
+    </form>
+</body>
+</html>
