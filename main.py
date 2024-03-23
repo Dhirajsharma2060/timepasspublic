@@ -5,11 +5,12 @@ import cv2
 import os 
 from dotenv import load_dotenv
 #from fastapi.templating import TemplateResponse
-from jinja2 import Template
+from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from database import SessionLocal, engine
 from test import test_conn
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 from models import Voter
 from connect import connect
 from fastapi import FastAPI, Depends, WebSocket
@@ -19,6 +20,7 @@ import models
 models.Base.metadata.create_all(bind=engine)
 load_dotenv()
 app = FastAPI()
+templates = Jinja2Templates(directory="templates") 
 def get_db():
     db = SessionLocal()
     try:
@@ -26,7 +28,8 @@ def get_db():
     finally:
         db.close()
 test_conn()
-conn, cursor = connect()        
+conn, cursor = connect()    
+   
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # In-memory data structure to store user data and face encoding
@@ -183,9 +186,9 @@ async def register(
 
         # Return a success message
         print("Redirecting to login page...")
-        return RedirectResponse("http://127.0.0.1:5500/login.html")
+        #return RedirectResponse(url="http://127.0.0.1:5500/templates/login.html")
+        return RedirectResponse("http://127.0.0.1:5500/templates/login.html")
         
-    
 
     except Exception as e:
         # Handle any exceptions (e.g., database errors)
@@ -199,7 +202,7 @@ async def register(
         if cursor is not None:
             cursor.close()
     
-    
+
 
 # Login page with face recognition
 #@app.get("/login", response_class=HTMLResponse)
@@ -219,7 +222,8 @@ async def login(
         if recognize_face(voter_Id):
             #so here the if condition it will check the user enter pasword and the password that is stored in the database
             if pwd_context.verify(password,user_data.password):
-                return RedirectResponse(url=f"/dashboard/{voter_Id}")
+                return {"message": "Login successful", "status": "success"}
+                #return JSONResponse(content={"message": "Login successful", "status": "success"}, status_code=200, headers={"Location": "/dashboard"})
             else:
                 raise HTTPException(status_code=401,detail="incorrect password please check")
         else:
@@ -227,24 +231,55 @@ async def login(
     else:
         raise HTTPException(status_code=404,detail="user not found")    
 # Dashboard endpoint
-@app.get("/dashboard/{voter_id}")
-async def dashboard(voter_id: int, db: Session = Depends(get_db)):
+#@app.get("/dashboard/{voter_id}")
+#async def dashboard(voter_id: int, db: Session = Depends(get_db)):
     # Query the database to retrieve user information based on voter_id
-    user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
+ #   user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
 
-    # Check if the user exists
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+  #  # Check if the user exists
+   # if not user:
+    #    raise HTTPException(status_code=404, detail="User not found")
 
     # Determine the voting status message based on the user's status
-    voting_status = "Voted" if user.status else "Not Voted"
+    #voting_status = "Voted" if user.status else "Not Voted"
 
     # Return all user information including voting status
-    return {
-        "user": {
-            "voter_id": user.voter_id,
-            "name": user.name,
-            "status": voting_status,
-            # Include any other relevant user information here
-        }
-    }
+    #return {
+     #   "user": {
+      #      "voter_id": user.voter_id,
+       #     "name": user.name,
+        #    "status": voting_status,
+         #   # Include any other relevant user information here
+       # }
+   # }
+# Dashboard endpoint to render user information in a template
+@app.get("/dashboard/{voter_Id}", response_class=HTMLResponse)
+async def dashoard(
+    request: Request,
+    voter_Id: int,
+    db: Session = Depends(get_db)
+):
+    
+        # Retrieve user information and voting status
+        user = db.query(Voter).filter(models.Voter.voter_id == voter_Id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        voting_status = "Voted" if user.status else "Not Voted"
+
+        # Render the dashboard template with user information
+       # return templates.TemplateResponse(
+        #    "dashoard.html",
+          #  {"request": request, "user": user, "voting_status": voting_status}
+        #)
+        return("success")
+@app.get("/logout")
+async def logout(session: Session = Depends(get_db)):
+    session.close()  # Close the session
+    return RedirectResponse(url="/")
+from fastapi.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/login", response_class=HTMLResponse)
+async def read_login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})

@@ -1,7 +1,8 @@
 from fastapi.middleware.cors import CORSMiddleware
 
 # List of allowed origins
-origins = ["http://127.0.0.1:5500"]
+origins = ["http://127.0.0.1:5500/templates/",
+           "http://localhost:3000"]
 
 # Function to create and configure CORS middleware
 def create_cors_middleware(app):
