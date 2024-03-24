@@ -4,6 +4,7 @@ import face_recognition
 import cv2
 import os 
 from dotenv import load_dotenv
+from core import create_cors_middleware
 #from fastapi.templating import TemplateResponse
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
@@ -17,10 +18,12 @@ from fastapi import FastAPI, Depends, WebSocket
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 #from websocket_manager import WebSocketManager
 import models
+import core
 models.Base.metadata.create_all(bind=engine)
 load_dotenv()
 app = FastAPI()
 templates = Jinja2Templates(directory="templates") 
+app.add_middleware(core.create_cors_middleware)
 def get_db():
     db = SessionLocal()
     try:
@@ -187,7 +190,8 @@ async def register(
         # Return a success message
         print("Redirecting to login page...")
         #return RedirectResponse(url="http://127.0.0.1:5500/templates/login.html")
-        return RedirectResponse("http://127.0.0.1:5500/templates/login.html")
+        #return RedirectResponse("http://127.0.0.1:5500/templates/login.html")
+        return("Sucess")
         
 
     except Exception as e:
@@ -271,7 +275,14 @@ async def dashoard(
         #    "dashoard.html",
           #  {"request": request, "user": user, "voting_status": voting_status}
         #)
-        return("success")
+        #return("success")
+        data= {
+        "voter_id": user.voter_id,
+        "name": user.name,
+        "status": voting_status,
+        # Include any other relevant user information here
+                 }
+        return JSONResponse(data)
 @app.get("/logout")
 async def logout(session: Session = Depends(get_db)):
     session.close()  # Close the session

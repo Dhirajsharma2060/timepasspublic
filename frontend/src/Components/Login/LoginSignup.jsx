@@ -44,26 +44,33 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `voter_Id=${voterId}&password=${password}`,
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed.');
-      }
-
-      // Handle successful login, e.g., redirect to dashboard or update UI
-      onRedirectToDashboard(); // Assuming this function redirects to the dashboard
+       const response = await fetch('http://127.0.0.1:8000/login', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/x-www-form-urlencoded',
+         },
+         body: `voter_Id=${voterId}&password=${password}`,
+       });
+   
+       if (!response.ok) {
+         // Handle HTTP errors
+         const errorData = await response.json(); // Assuming the backend sends JSON error messages
+         throw new Error(errorData.message || 'Login failed.');
+       }
+   
+       const responseData = await response.json();
+       console.log('Response data:', responseData);
+   
+       const voterIdFromResponse = responseData.voter_id;
+       onRedirectToDashboard(voterIdFromResponse);
     } catch (error) {
-      console.error('Error during login:', error);
-      setLoginError('Incorrect username or password. Please try again.');
+       console.error('Error during login:', error);
+       setLoginError(error.message);
     }
-  };
-
+   };
+   
+  
+  
   return (
     <div className='container'>
       <div className="header">
