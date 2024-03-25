@@ -5,7 +5,7 @@ import pancardIcon from '../Assets/email.png';
 import passwordIcon from '../Assets/password.png';
 
 const LoginSignup = ({ onRedirectToDashboard }) => {
-  const [voterId, setVoterId] = useState('');
+  const [voter_Id, setVoterId] = useState('');
   const [action, setAction] = useState("Sign Up");
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +28,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `voter_Id=${voterId}&username=${username}&password=${password}`,
+        body: `voter_Id=${voter_Id}&username=${username}&password=${password}`,
       });
 
       if (!response.ok) {
@@ -49,7 +49,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
          headers: {
            'Content-Type': 'application/x-www-form-urlencoded',
          },
-         body: `voter_Id=${voterId}&password=${password}`,
+         body: `voter_Id=${voter_Id}&password=${password}`,
        });
    
        if (!response.ok) {
@@ -61,7 +61,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
        const responseData = await response.json();
        console.log('Response data:', responseData);
    
-       const voterIdFromResponse = responseData.voter_id;
+       const voterIdFromResponse = responseData.voter_Id;
        onRedirectToDashboard(voterIdFromResponse);
     } catch (error) {
        console.error('Error during login:', error);
@@ -103,7 +103,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
           <input
             type="text"
             placeholder="Voter ID"
-            value={voterId}
+            value={voter_Id}
             onChange={(e) => setVoterId(e.target.value)}
           />
         </div>

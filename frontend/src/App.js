@@ -4,11 +4,11 @@ import Dashboard from './Components/Login/Dashboard';
 
 const App = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
-  const [voterId, setVoterId] = useState('');
+  const [voter_Id, setVoterId] = useState(''); // Initialize voter_Id state
 
-  const redirectToDashboard = (id) => {
+  const redirectToDashboard = (voter_Id) => { // Change the parameter name to voterId
     setLoggedIn(true);
-    setVoterId(id);
+    setVoterId(voter_Id); // Set the voterId received from the login/signup component
   };
 
   // Define the parties array with the names of the four parties
@@ -17,13 +17,12 @@ const App = () => {
   return (
     <div>
       {isLoggedIn ? (
-        <Dashboard voterId={voterId} parties={parties} />
+        <Dashboard voter_Id={voter_Id} parties={parties} />
       ) : (
-        <LoginSignup onRedirectToDashboard={redirectToDashboard} />
+        <LoginSignup onRedirectToDashboard={redirectToDashboard}  /> // Pass voterId to LoginSignup
       )}
     </div>
   );
 };
 
 export default App;
-

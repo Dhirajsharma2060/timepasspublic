@@ -215,7 +215,7 @@ async def register(
 
 @app.post("/login")
 async def login(
-    voter_Id: str = Form(...),
+    voter_Id: int = Form(...),
     password:str=Form(...),
     db: Session = Depends(get_db)
 ):
@@ -259,7 +259,6 @@ async def login(
 # Dashboard endpoint to render user information in a template
 @app.get("/dashboard/{voter_Id}", response_class=HTMLResponse)
 async def dashoard(
-    request: Request,
     voter_Id: int,
     db: Session = Depends(get_db)
 ):
@@ -277,7 +276,7 @@ async def dashoard(
         #)
         #return("success")
         data= {
-        "voter_id": user.voter_id,
+        "voter_Id": user.voter_id,
         "name": user.name,
         "status": voting_status,
         # Include any other relevant user information here
