@@ -11,6 +11,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
   const [password, setPassword] = useState('');
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [,setLoginResponse] = useState(null); // State to store the login response
 
   const handleActionChange = (newAction) => {
     setAction(newAction);
@@ -44,30 +45,30 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
 
   const handleLogin = async () => {
     try {
-       const response = await fetch('http://127.0.0.1:8000/login', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/x-www-form-urlencoded',
-         },
-         body: `voter_Id=${voter_Id}&password=${password}`,
-       });
-   
-       if (!response.ok) {
-         // Handle HTTP errors
-         const errorData = await response.json(); // Assuming the backend sends JSON error messages
-         throw new Error(errorData.message || 'Login failed.');
-       }
-   
-       const responseData = await response.json();
-       console.log('Response data:', responseData);
-   
-       const voterIdFromResponse = responseData.voter_Id;
-       onRedirectToDashboard(voterIdFromResponse);
+      const response = await fetch('http://127.0.0.1:8000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `voter_Id=${voter_Id}&password=${password}`,
+      });
+
+      if (!response.ok) {
+        // Handle HTTP errors
+        const errorData = await response.json(); // Assuming the backend sends JSON error messages
+        throw new Error(errorData.message || 'Login failed.');
+      }
+
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
+
+      setLoginResponse(responseData); // Store the login response in state
+      onRedirectToDashboard(responseData); // Pass the login response to Dashboard
     } catch (error) {
-       console.error('Error during login:', error);
-       setLoginError(error.message);
+      console.error('Error during login:', error);
+      setLoginError(error.message);
     }
-   };
+  };
    
   
   

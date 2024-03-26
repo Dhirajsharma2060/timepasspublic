@@ -216,72 +216,38 @@ async def register(
 @app.post("/login")
 async def login(
     voter_Id: int = Form(...),
-    password:str=Form(...),
+    password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    #cursor.execute("SELECT * FROM voter WHERE voter_Id = %s", (voter_Id,))
     user_data = db.query(models.Voter).filter(models.Voter.voter_id == voter_Id).first()
-    # Check if the voter_Id exists in the in-memory data
+    
     if user_data:
         if recognize_face(voter_Id):
-            #so here the if condition it will check the user enter pasword and the password that is stored in the database
-            if pwd_context.verify(password,user_data.password):
-                return {"message": "Login successful", "status": "success"}
-                #return JSONResponse(content={"message": "Login successful", "status": "success"}, status_code=200, headers={"Location": "/dashboard"})
+            if pwd_context.verify(password, user_data.password):
+                return RedirectResponse(url=f"/dashboard/{voter_Id}",status_code=303)
             else:
-                raise HTTPException(status_code=401,detail="incorrect password please check")
+                raise HTTPException(status_code=401, detail="Incorrect password. Please check.")
         else:
-            raise HTTPException(status_code=401, detail="Face recognition failed")
+            raise HTTPException(status_code=401, detail="Face recognition failed.")
     else:
-        raise HTTPException(status_code=404,detail="user not found")    
-# Dashboard endpoint
-#@app.get("/dashboard/{voter_id}")
-#async def dashboard(voter_id: int, db: Session = Depends(get_db)):
-    # Query the database to retrieve user information based on voter_id
- #   user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
+        raise HTTPException(status_code=404, detail="User not found.")
 
-  #  # Check if the user exists
-   # if not user:
-    #    raise HTTPException(status_code=404, detail="User not found")
-
-    # Determine the voting status message based on the user's status
-    #voting_status = "Voted" if user.status else "Not Voted"
-
-    # Return all user information including voting status
-    #return {
-     #   "user": {
-      #      "voter_id": user.voter_id,
-       #     "name": user.name,
-        #    "status": voting_status,
-         #   # Include any other relevant user information here
-       # }
-   # }
-# Dashboard endpoint to render user information in a template
 @app.get("/dashboard/{voter_Id}", response_class=HTMLResponse)
-async def dashoard(
+async def dashboard(
     voter_Id: int,
     db: Session = Depends(get_db)
 ):
-    
-        # Retrieve user information and voting status
-        user = db.query(Voter).filter(models.Voter.voter_id == voter_Id).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        voting_status = "Voted" if user.status else "Not Voted"
+    user = db.query(models.Voter).filter(models.Voter.voter_id == voter_Id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    voting_status = "Voted" if user.status else "Not Voted"
 
-        # Render the dashboard template with user information
-       # return templates.TemplateResponse(
-        #    "dashoard.html",
-          #  {"request": request, "user": user, "voting_status": voting_status}
-        #)
-        #return("success")
-        data= {
+    data = {
         "voter_Id": user.voter_id,
         "name": user.name,
         "status": voting_status,
-        # Include any other relevant user information here
-                 }
-        return JSONResponse(data)
+    }
+    return JSONResponse(data)
 @app.get("/logout")
 async def logout(session: Session = Depends(get_db)):
     session.close()  # Close the session

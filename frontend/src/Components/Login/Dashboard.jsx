@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const Dashboard = ({ parties }) => {
+const Dashboard = ({ userData, parties }) => {
   const [user, setUser] = useState({});
-  const [voterIdInput, setVoterIdInput] = useState('');
   const [votedParties, setVotedParties] = useState([]);
+
+  useEffect(() => {
+    // Fetch user data when userData changes (i.e., when login/signup is successful)
+    if (userData) {
+      fetchUserData(userData.voter_Id);
+    }
+  }, [userData]);
 
   const fetchUserData = async (voterId) => {
     try {
@@ -38,27 +44,15 @@ const Dashboard = ({ parties }) => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetchUserData(voterIdInput);
-  };
-
   console.log('User state:', user); // Log the user state for debugging
 
   return (
     <div className='dashboard-container' style={{ backgroundColor: 'cyan', minHeight: '100vh', padding: '20px' }}>
       <h2>Welcome to the Dashboard</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Enter Voter ID:
-          <input type="text" value={voterIdInput} onChange={(e) => setVoterIdInput(e.target.value)} />
-        </label>
-        <button type="submit">Submit</button>
-      </form>
       {user && (
         <div>
           <h3>User Information:</h3>
-          <p>Voter ID: {voterIdInput}</p>
+          <p>Voter ID: {userData.voter_Id}</p> {/* Display voter ID from userData */}
           <p>Name: {user.name}</p>
           <p>Status: {user.status}</p>
         </div>
