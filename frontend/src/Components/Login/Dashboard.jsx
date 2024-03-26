@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-const Dashboard = ({ userData, parties }) => {
+const Dashboard = ({ userData, parties,handleVote, votedParty }) => {
   const [user, setUser] = useState({});
-  const [votedParties, setVotedParties] = useState([]);
+  const [votedParties] = useState([]);
 
   useEffect(() => {
     // Fetch user data when userData changes (i.e., when login/signup is successful)
@@ -35,14 +35,14 @@ const Dashboard = ({ userData, parties }) => {
     }
   };
 
-  const handleVote = (party) => {
-    if (votedParties.includes(party)) {
-      alert(`You have already voted for ${party}`);
-    } else {
-      setVotedParties([...votedParties, party]);
-      console.log(`Voted for ${party}`);
-    }
-  };
+  //const handleVote = (party) => {
+    //if (votedParties.includes(party)) {
+      //alert(`You have already voted for ${party}`);
+    //} else {
+      //setVotedParties([...votedParties, party]);
+      //console.log(`Voted for ${party}`);
+    //}
+  //};
 
   console.log('User state:', user); // Log the user state for debugging
 
@@ -64,6 +64,7 @@ const Dashboard = ({ userData, parties }) => {
             {party}{' '}
             <button
               onClick={() => handleVote(party)}
+              disabled={user.status === "voted" && votedParties.includes(party)} // Disable button if user has already voted for this party
               style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '5px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
             >
               Vote

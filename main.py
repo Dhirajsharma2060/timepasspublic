@@ -259,3 +259,27 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/login", response_class=HTMLResponse)
 async def read_login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
+@app.post("/vote/{voter_Id}/{party}")
+async def vote(
+    voter_Id: int,
+    party: str,
+    db: Session = Depends(get_db)
+):
+    # Check if the voter exists
+    voter = db.query(Voter).filter(Voter.voter_id == voter_Id).first()
+    if voter is None:
+        raise HTTPException(status_code=404, detail="Voter not found")
+
+    # Check if the voter has already voted
+    if voter.status:
+        raise HTTPException(status_code=400, detail="Voter has already voted")
+
+    # Update the voter's status to indicate that they have voted
+    voter.status = True
+    # Update the voted party for the voter
+    voter.voted_party = party
+
+    # Commit the changes to the database
+    db.commit()
+
+    return {"message": f"Vote for {party} recorded successfully"}
