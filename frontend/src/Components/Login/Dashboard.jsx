@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Dashboard = ({ userData, parties,handleVote, votedParty }) => {
+const Dashboard = ({ userData, parties, handleVote,votedParty }) => {
   const [user, setUser] = useState({});
   const [votedParties] = useState([]);
 
@@ -34,15 +34,6 @@ const Dashboard = ({ userData, parties,handleVote, votedParty }) => {
       console.error('Error fetching user data:', error);
     }
   };
-
-  //const handleVote = (party) => {
-    //if (votedParties.includes(party)) {
-      //alert(`You have already voted for ${party}`);
-    //} else {
-      //setVotedParties([...votedParties, party]);
-      //console.log(`Voted for ${party}`);
-    //}
-  //};
 
   console.log('User state:', user); // Log the user state for debugging
 
