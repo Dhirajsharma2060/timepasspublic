@@ -283,3 +283,66 @@ async def vote(
     db.commit()
 
     return {"message": f"Vote for {party} recorded successfully"}
+
+@app.put("/users/{voter_id}")
+async def get_update_user(voter_id: int, new_data: dict, db: Session = Depends(get_db)):
+    # Fetch the user from the database
+    user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Show the current user information
+    user_info = {
+        "voter_id": user.voter_id,
+        "name": user.name,
+        "status": user.status,
+        # Add more fields as needed
+    }
+
+    # Update user information based on the new_data dictionary
+    for key, value in new_data.items():
+        setattr(user, key, value)
+
+    # Commit the changes to the database
+    db.commit()
+
+    return {"message": "User information updated successfully", "user_info": user_info}
+
+# Endpoint to delete a user
+@app.delete("/users/{voter_id}")
+async def delete_user(voter_id: int, db: Session = Depends(get_db)):
+    # Fetch the user from the database
+    user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Delete the user from the database
+    db.delete(user)
+    db.commit()
+
+    return {"message": "User deleted successfully"}
+# Endpoint for changing password (forgot password)
+@app.post("/forgot-password")
+async def forgot_password(
+    voter_id: int = Form(...),
+    new_password: str = Form(...),
+    confirm_password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    # Fetch the user from the database
+    user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check if the new password and confirm password match
+    if new_password != confirm_password:
+        raise HTTPException(status_code=400, detail="Passwords do not match")
+
+    # Hash the new password
+    hashed_password = pwd_context.hash(new_password)
+
+    # Update the user's password in the database
+    user.password = hashed_password
+    db.commit()
+
+    return {"message": "Password updated successfully"}
