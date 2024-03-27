@@ -69,6 +69,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
       setLoginError(error.message);
     }
   };
+  
    
   
   

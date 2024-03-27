@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import './Dashboard.css'; // Import the CSS file
+import electionSymbol from'../Assets/election symbol.png';
 
 const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) => {
   const [user, setUser] = useState({});
@@ -42,35 +44,45 @@ const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) 
   };
 
   return (
-    <div className='dashboard-container' style={{ backgroundColor: 'cyan', minHeight: '100vh', padding: '20px' }}>
-      <h2>Welcome to the Dashboard</h2>
-      {user && (
-        <div>
-          <h3>User Information:</h3>
-          <p>Voter ID: {userData.voter_Id}</p> {/* Display voter ID from userData */}
-          <p>Name: {user.name}</p>
-          <p>Status: {user.status}</p>
+    <div className='dashboard-container'>
+      <div className='dashboard-header'>
+        <h2 className='dashboard-title'>Online Voting System</h2>
+        <button className='logout-button' onClick={handleLogoutClick}>Logout</button>
+      </div>
+      <div className='image-container'>
+        <img src={electionSymbol} alt="Election Symbol" />
+      </div>
+      <div className='user-info-container'>
+        <div className='user-info'>
+          {user && (
+            <div>
+              <h3>User Information:</h3>
+              <p>Voter ID: {userData.voter_Id}</p>
+              <p>Name: {user.name}</p>
+              <p>Status: {user.status}</p>
+            </div>
+          )}
         </div>
-      )}
-      <button onClick={handleLogoutClick}>Logout</button>
-      <h3>Parties:</h3>
-      <ul>
-        {parties.map((party, index) => (
-          <li key={index} style={{ marginBottom: '10px' }}>
-            {party}{' '}
-            <button
-              onClick={() => handleVote(party)}
-              disabled={user.status === "voted" && votedParties.includes(party)} // Disable button if user has already voted for this party
-              style={{ marginLeft: '10px', padding: '5px 10px', borderRadius: '5px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
-            >
-              Vote
-            </button>
-          </li>
-        ))}
-      </ul>
+      </div>
+      <div className='parties-list-container'>
+        <h3>Parties:</h3>
+        <ul className='parties-list'>
+          {parties.map((party, index) => (
+            <li key={index} className='party-item'>
+              {party}{' '}
+              <button
+                onClick={() => handleVote(party)}
+                disabled={user.status === "voted" && votedParties.includes(party)}
+                className='vote-button'
+              >
+                Vote
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
 
 export default Dashboard;
-
