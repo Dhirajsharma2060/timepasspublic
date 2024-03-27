@@ -28,7 +28,7 @@ const App = () => {
       console.log('User status:', userData.status);
 
       // Check if the user's status is "voted" before showing the alert
-      if (userData.status === "voted") {
+      if (userData.status === "Voted") {
         console.log("User has already voted");
         alert("You have already voted. You cannot vote more than once.");
       } else {
@@ -39,14 +39,18 @@ const App = () => {
       console.error('Error voting:', error);
     }
   };  
+  const handleLogout = () => {
+    setLoggedIn(false); // Set isLoggedIn state to false
+    setUserData(null); // Clear userData state
+  };
 
   // Define the parties array with the names of the four parties
-  const parties = ['BJP', 'CONGRESS', 'SHIVSENA', 'AAP'];
+  const parties = ['BJP', 'CONGRESS', 'SHIVSENA', 'AAP','NOTA'];
 
   return (
     <div>
       {isLoggedIn ? (
-        <Dashboard userData={userData} parties={parties} handleVote={handleVote} votedParty={votedParty} />
+        <Dashboard userData={userData} parties={parties} handleVote={handleVote} votedParty={votedParty} handleLogout={handleLogout} />
       ) : (
         <LoginSignup onRedirectToDashboard={redirectToDashboard} />
       )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Dashboard = ({ userData, parties, handleVote,votedParty }) => {
+const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) => {
   const [user, setUser] = useState({});
   const [votedParties] = useState([]);
 
@@ -37,6 +37,10 @@ const Dashboard = ({ userData, parties, handleVote,votedParty }) => {
 
   console.log('User state:', user); // Log the user state for debugging
 
+  const handleLogoutClick = () => {
+    handleLogout(); // Call the parent component's handleLogout function
+  };
+
   return (
     <div className='dashboard-container' style={{ backgroundColor: 'cyan', minHeight: '100vh', padding: '20px' }}>
       <h2>Welcome to the Dashboard</h2>
@@ -48,6 +52,7 @@ const Dashboard = ({ userData, parties, handleVote,votedParty }) => {
           <p>Status: {user.status}</p>
         </div>
       )}
+      <button onClick={handleLogoutClick}>Logout</button>
       <h3>Parties:</h3>
       <ul>
         {parties.map((party, index) => (
@@ -68,3 +73,4 @@ const Dashboard = ({ userData, parties, handleVote,votedParty }) => {
 };
 
 export default Dashboard;
+

@@ -102,6 +102,7 @@ def recognize_face(voter_Id: str):
             if results[0]:
                 cv2.putText(frame, f"Match Found for {voter_Id}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 cv2.putText(frame, "Please press Q", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                return True
             else:
                 cv2.putText(frame, f"No Match for {voter_Id}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 return False
@@ -117,7 +118,7 @@ def recognize_face(voter_Id: str):
     # Release the webcam and close the OpenCV window
     video_capture.release()
     cv2.destroyAllWindows()
-    return True
+    return False
 
 def is_valid_voter_Id(voter_Id: int) -> bool:
     return len(str(voter_Id)) == 10
