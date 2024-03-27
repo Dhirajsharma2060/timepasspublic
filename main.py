@@ -334,6 +334,10 @@ async def forgot_password(
     user = db.query(Voter).filter(Voter.voter_id == voter_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    # Check if the face matches
+    if not recognize_face(str(voter_id)):
+        raise HTTPException(status_code=401, detail="Face recognition failed.")
+
 
     # Check if the new password and confirm password match
     if new_password != confirm_password:
