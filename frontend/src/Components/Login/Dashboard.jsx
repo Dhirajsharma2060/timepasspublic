@@ -46,7 +46,7 @@ const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) 
   return (
     <div className='dashboard-container'>
       <div className='dashboard-header'>
-        <h2 className='dashboard-title'>Online Voting System</h2>
+        <h2 className='dashboard-title'><span>Online</span> <span>Voting</span> <span>System</span></h2>
         <button className='logout-button' onClick={handleLogoutClick}>Logout</button>
       </div>
       <div className='image-container'>
