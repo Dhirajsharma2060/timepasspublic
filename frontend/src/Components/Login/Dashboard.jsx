@@ -2,11 +2,27 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css'; // Import the CSS file
 import electionSymbol from '../Assets/election symbol.png';
 
-const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) => {
+const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
   const [user, setUser] = useState({});
   const [votedParties] = useState([]);
-  
-  // Function to fetch user data
+
+  useEffect(() => {
+    // Fetch user data when userData changes (i.e., when login/signup is successful)
+    if (userData) {
+      fetchUserData(userData.voter_Id);
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    // Refresh user data every 10 seconds
+    const interval = setInterval(() => {
+      fetchUserData(user.voter_Id);
+    }, 10000);
+
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+
+  }, [user]);
+
   const fetchUserData = async (voterId) => {
     try {
       if (!voterId) {
@@ -31,22 +47,6 @@ const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) 
     }
   };
 
-  // Use useEffect to fetch user data initially and then set up interval to fetch data periodically
-  useEffect(() => {
-    // Fetch user data when userData changes (i.e., when login/signup is successful)
-    if (userData) {
-      fetchUserData(userData.voter_Id);
-
-      // Set up interval to fetch user data every 10 seconds
-      const intervalId = setInterval(() => {
-        fetchUserData(userData.voter_Id);
-      }, 10000); // 10 seconds in milliseconds
-
-      // Clean up the interval when the component unmounts
-      return () => clearInterval(intervalId);
-    }
-  }, [userData]); // Dependency array with userData
-
   const handleLogoutClick = () => {
     handleLogout(); // Call the parent component's handleLogout function
   };
@@ -65,7 +65,7 @@ const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) 
           {user && (
             <div>
               <h3>User Information:</h3>
-              <p>Voter ID: {userData.voter_Id}</p>
+              <p>Voter ID: {user.voter_Id}</p>
               <p>Name: {user.name}</p>
               <p>Status: {user.status}</p>
             </div>
