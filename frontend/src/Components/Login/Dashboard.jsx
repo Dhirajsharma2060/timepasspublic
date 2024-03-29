@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css'; // Import the CSS file
-import electionSymbol from'../Assets/election symbol.png';
+import electionSymbol from '../Assets/election symbol.png';
 
 const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) => {
   const [user, setUser] = useState({});
   const [votedParties] = useState([]);
-
-  useEffect(() => {
-    // Fetch user data when userData changes (i.e., when login/signup is successful)
-    if (userData) {
-      fetchUserData(userData.voter_Id);
-    }
-  }, [userData]);
-
+  
+  // Function to fetch user data
   const fetchUserData = async (voterId) => {
     try {
       if (!voterId) {
@@ -37,7 +31,21 @@ const Dashboard = ({ userData, parties, handleVote, votedParty, handleLogout }) 
     }
   };
 
-  console.log('User state:', user); // Log the user state for debugging
+  // Use useEffect to fetch user data initially and then set up interval to fetch data periodically
+  useEffect(() => {
+    // Fetch user data when userData changes (i.e., when login/signup is successful)
+    if (userData) {
+      fetchUserData(userData.voter_Id);
+
+      // Set up interval to fetch user data every 10 seconds
+      const intervalId = setInterval(() => {
+        fetchUserData(userData.voter_Id);
+      }, 10000); // 10 seconds in milliseconds
+
+      // Clean up the interval when the component unmounts
+      return () => clearInterval(intervalId);
+    }
+  }, [userData]); // Dependency array with userData
 
   const handleLogoutClick = () => {
     handleLogout(); // Call the parent component's handleLogout function

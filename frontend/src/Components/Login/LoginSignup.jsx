@@ -12,6 +12,10 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [,setLoginResponse] = useState(null); // State to store the login response
+  const [new_password,setNewPassword]=useState('');
+  const [confirm_password,setConfirmPassword]=useState('');
+  const [forgetpasswordSuccess,setForgetpasswordSuccess]=useState(false); // State to store the forget password success status
+
 
   const handleActionChange = (newAction) => {
     setAction(newAction);
@@ -20,6 +24,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
     setPassword('');
     setSignupSuccess(false);
     setLoginError(''); // Reset login error message
+    setForgetpasswordSuccess(false);
   };
 
   const handleSubmit = async () => {
@@ -69,6 +74,27 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
       setLoginError(error.message);
     }
   };
+  const handleForgetpassword = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `voter_Id=${voter_Id}&new_password=${new_password}&confirm_password=${confirm_password}`,
+      });
+
+      if (!response.ok) {
+        throw new Error('Forget password failed.');
+      }
+
+      setForgetpasswordSuccess(true);
+    } catch (error) {
+      console.error('Error during changing password:', error);
+      // Handle forget password error, e.g., show an error message to the user
+    }
+  };
+
   
    
   
