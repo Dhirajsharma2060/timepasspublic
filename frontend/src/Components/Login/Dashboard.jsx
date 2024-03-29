@@ -8,7 +8,7 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
 
   useEffect(() => {
     // Fetch user data when userData changes (i.e., when login/signup is successful)
-    if (userData) {
+    if (userData && userData.voter_Id) {
       fetchUserData(userData.voter_Id);
     }
   }, [userData]);
@@ -16,11 +16,12 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
   useEffect(() => {
     // Refresh user data every 10 seconds
     const interval = setInterval(() => {
-      fetchUserData(user.voter_Id);
+      if (user && user.voter_Id) {
+        fetchUserData(user.voter_Id);
+      }
     }, 10000);
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
-
   }, [user]);
 
   const fetchUserData = async (voterId) => {
@@ -51,6 +52,14 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
     handleLogout(); // Call the parent component's handleLogout function
   };
 
+  const handleVoteClick = (party) => {
+    if (user && user.status === 'Voted') {
+      alert('You have already voted.');
+      return;
+    }
+    handleVote(party);
+  };
+
   return (
     <div className='dashboard-container'>
       <div className='dashboard-header'>
@@ -62,13 +71,15 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
       </div>
       <div className='user-info-container'>
         <div className='user-info'>
-          {user && (
+          {user && user.voter_Id ? (
             <div>
               <h3>User Information:</h3>
               <p>Voter ID: {user.voter_Id}</p>
               <p>Name: {user.name}</p>
               <p>Status: {user.status}</p>
             </div>
+          ) : (
+            <p>Loading user information...</p>
           )}
         </div>
       </div>
@@ -79,8 +90,8 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
             <li key={index} className='party-item'>
               {party}{' '}
               <button
-                onClick={() => handleVote(party)}
-                disabled={user.status === "voted" && votedParties.includes(party)}
+                onClick={() => handleVoteClick(party)}
+                disabled={user.status === "Voted" && votedParties.includes(party)}
                 className='vote-button'
               >
                 Vote
