@@ -15,6 +15,8 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
   const [new_password,setNewPassword]=useState('');
   const [confirm_password,setConfirmPassword]=useState('');
   const [forgetpasswordSuccess,setForgetpasswordSuccess]=useState(false); // State to store the forget password success status
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [passwordChanged, setPasswordChanged] = useState(false);
 
   const handleActionChange = (newAction) => {
     setAction(newAction);
@@ -24,6 +26,8 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
     setSignupSuccess(false);
     setLoginError(''); // Reset login error message
     setForgetpasswordSuccess(false); // Reset forget password success status
+    setPasswordChanged(false); // Reset password changed status
+    setShowConfirmation(false); // Hide confirmation dialog
   };
 
   const handleSubmit = async () => {
@@ -74,6 +78,19 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
     }
   };
 
+  const handleForgetPasswordClick = () => {
+    setShowConfirmation(true);
+  };
+
+  const handleForgetPasswordConfirm = () => {
+    setForgetpasswordSuccess(true);
+    setShowConfirmation(false);
+  };
+
+  const handleForgetPasswordCancel = () => {
+    setShowConfirmation(false);
+  };
+
   const handleForgetPassword = async () => {
     try {
       // Validate passwords before sending request
@@ -99,17 +116,16 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
         throw new Error(errorData.message || 'Password reset failed.');
       }
 
-      setForgetpasswordSuccess(true);
+      setPasswordChanged(true); // Set password changed status to true
     } catch (error) {
       console.error('Error during changing password:', error);
       setLoginError(error.message); // Consider using a separate state for forget password errors
     }
   };
 
-  const handleForgetPasswordClick = () => {
-    setForgetpasswordSuccess(true);
+  const handleForgetPasswordClose = () => {
+    setForgetpasswordSuccess(false);
   };
-
 
   return (
     <div className='container'>
@@ -125,8 +141,6 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
       {loginError && (
         <div className="error-message">{loginError}</div>
       )}
-
-      
 
       <div className="inputs">
         {action === "Login" ? null : (
@@ -173,7 +187,6 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
         </div>
       )}
 
-
       {action === "Sign Up" ? (
         <div className="Already">
           Already a user? <span onClick={() => handleActionChange("Login")}>Click Here!</span>
@@ -199,9 +212,27 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
         >
           Login
         </div>
-       </div> 
-        {forgetpasswordSuccess && (
+      </div>
+
+      {showConfirmation && (
+        <div className="confirmation-dialog">
+          <div className="confirmation-message">
+            Are you sure you want to reset your password?
+          </div>
+          <div className="confirmation-buttons">
+            <button onClick={handleForgetPasswordConfirm}>Yes</button>
+            <button onClick={handleForgetPasswordCancel}>No</button>
+          </div>
+        </div>
+      )}
+
+      {passwordChanged && (
+        <div className="success-message">Password changed successfully! Redirecting to login page...</div>
+      )}
+
+      {forgetpasswordSuccess && (
         <div className="forgot-password-form">
+          <div className="close-button" onClick={handleForgetPasswordClose}>Close</div> {/* Close button */}
           <h2>Forgot Password?</h2>
           <div className="input">
             <img src={pancardIcon} alt="" />
@@ -233,10 +264,6 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
           <button className="submit" onClick={handleForgetPassword}>
             Submit
           </button>
-          {forgetpasswordSuccess && (
-        <div className="success-message">Sucessfully changed the password.</div>
-      )}
-          
         </div>
       )}
     </div>

@@ -19,7 +19,7 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
       if (user && user.voter_Id) {
         fetchUserData(user.voter_Id);
       }
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [user]);
@@ -74,6 +74,7 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
           {user && user.voter_Id ? (
             <div>
               <h3>User Information:</h3>
+              <div class="user-separator"></div>
               <p>Voter ID: {user.voter_Id}</p>
               <p>Name: {user.name}</p>
               <p>Status: {user.status}</p>
@@ -85,6 +86,7 @@ const Dashboard = ({ userData, parties, handleVote, handleLogout }) => {
       </div>
       <div className='parties-list-container'>
         <h3>Parties:</h3>
+        <div class="party-separator"></div>
         <ul className='parties-list'>
           {parties.map((party, index) => (
             <li key={index} className='party-item'>

@@ -4,6 +4,8 @@ import face_recognition
 import cv2
 import os 
 from dotenv import load_dotenv
+import numpy as np
+from sqlalchemy import func
 from core import create_cors_middleware
 #from fastapi.templating import TemplateResponse
 from fastapi.templating import Jinja2Templates
@@ -77,48 +79,53 @@ def capture_and_save_image(voter_Id: str):
     return reference_encoding
 def recognize_face(voter_Id: str):
     folder_path = "imageref"
-    video_capture = cv2.VideoCapture(0)
-
-    # Load the reference image and compute its encoding
     reference_filename = os.path.join(folder_path, f"{voter_Id}_image.jpg")
-    reference_image = face_recognition.load_image_file(reference_filename)
-    reference_encoding = face_recognition.face_encodings(reference_image)[0]
+    reference_image = cv2.imread(reference_filename)
+    reference_image = cv2.cvtColor(reference_image, cv2.COLOR_BGR2RGB)
+    reference_face_locations = face_recognition.face_locations(reference_image)
+    reference_encodings = face_recognition.face_encodings(reference_image, reference_face_locations, model='small')
+
+    if len(reference_encodings) == 0:
+        print("Error: Failed to encode reference face.")
+        return False
+
+    reference_encoding = reference_encodings[0]
+
+    video_capture = cv2.VideoCapture(0)
+    distance = float('inf')  # Initialize distance with a default value
 
     while True:
-        # Capture a frame from the webcam
         ret, frame = video_capture.read()
+        if not ret:
+            print("Error: Failed to capture frame.")
+            break
 
-        # Find face locations in the frame
-        face_locations = face_recognition.face_locations(frame)
-
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        face_locations = face_recognition.face_locations(frame_rgb)
+        
         if len(face_locations) > 0:
-            # Encode the detected face
-            face_encoding = face_recognition.face_encodings(frame, face_locations)[0]
+            face_encodings = face_recognition.face_encodings(frame_rgb, face_locations, model='small')
+            if len(face_encodings) > 0:
+                face_encoding = face_encodings[0]
+                distance = np.linalg.norm(reference_encoding - face_encoding)
 
-            # Compare the detected face encoding with the reference encoding
-            results = face_recognition.compare_faces([reference_encoding], face_encoding)
+                if distance < 0.6:  # Adjust threshold for accurate matching
+                    cv2.putText(frame, f"Match Found for {voter_Id}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    cv2.putText(frame, "Please press Q", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                else:
+                    cv2.putText(frame, f"No Match for {voter_Id}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    cv2.putText(frame, "Face does not match", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    break  # Exit the loop if face does not match
 
-            # Display recognition result
-            if results[0]:
-                cv2.putText(frame, f"Match Found for {voter_Id}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                cv2.putText(frame, "Please press Q", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                return True
-            else:
-                cv2.putText(frame, f"No Match for {voter_Id}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                return False
-    
-
-        # Display the frame
         cv2.imshow('Face Recognition', frame)
 
-        # Break the loop when 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Release the webcam and close the OpenCV window
     video_capture.release()
     cv2.destroyAllWindows()
-    return False
+
+    return distance < 0.6  # Return True if match found
 
 def is_valid_voter_Id(voter_Id: int) -> bool:
     return len(str(voter_Id)) == 10
@@ -351,3 +358,14 @@ async def forgot_password(
     db.commit()
 
     return {"message": "Password updated successfully"}
+@app.get("/count-votes")
+async def count_votes(db: Session = Depends(get_db)):
+    # Query the database to get the count of votes for each party
+    vote_counts = db.query(Voter.voted_party, func.count(Voter.voter_id)).filter(Voter.voted_party !=None).group_by(Voter.voted_party).all()
+
+    # Prepare the response data
+    result = {}
+    for party, count in vote_counts:
+        result[party] = count
+
+    return result
