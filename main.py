@@ -1,5 +1,5 @@
 from re import template
-from fastapi import Depends, FastAPI, Form, HTTPException, Request, WebSocket, WebSocketDisconnect, requests
+from fastapi import Depends, FastAPI, Form, HTTPException, Request, Response, WebSocket, WebSocketDisconnect, requests
 import face_recognition
 import cv2
 import os 
@@ -11,6 +11,8 @@ from core import create_cors_middleware
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from database import SessionLocal, engine
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from test import test_conn
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
@@ -39,6 +41,11 @@ conn, cursor = connect()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # In-memory data structure to store user data and face encoding
 #my_data = {}
+# Define the scope and credentials for accessing Google Sheets
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+credentials = ServiceAccountCredentials.from_json_keyfile_name('credential.json', scope)
+client = gspread.authorize(credentials)
+
 
 conn,cursor=connect()
 def is_valid_voter_Id(voter_Id: int) -> bool:
@@ -368,4 +375,26 @@ async def count_votes(db: Session = Depends(get_db)):
     for party, count in vote_counts:
         result[party] = count
 
+    # Update Google Sheets with the vote counts
+    spreadsheet = client.open('counting_votes')
+    worksheet = spreadsheet.get_worksheet(0)  # Assuming data is in the first sheet
+    worksheet.clear()  # Clear existing data
+    header_row = ['Party', 'Votes']  # Assuming column headers
+    worksheet.append_row(header_row)  # Add header row
+    for party, count in result.items():
+        worksheet.append_row([party, count])  # Append party and vote count
+
     return result
+# Admin credentials
+admin_credentials = {"admin@2024": "401104"}
+
+@app.post("/admin-login", response_class=HTMLResponse)
+async def admin_login(username: str = Form(...), password: str = Form(...)):
+    if username in admin_credentials and password == admin_credentials[username]:
+        # Admin authentication successful
+        response = Response(content="Admin login successful. You have access to admin privileges.")
+        response.headers["HX-Trigger"] = "result"
+        response.headers["HX-Scroll-Target"] = "#result"
+        return response
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials. Access denied.")
