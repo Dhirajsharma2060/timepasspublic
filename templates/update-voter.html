@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User Information</title>
+</head>
+<body>
+
+<h2>Update User Information</h2>
+
+<form id="updateForm">
+    <label for="voterId">Voter ID:</label><br>
+    <input type="text" id="voterId" name="voterId" required><br>
+    <button type="button" id="searchButton">Search</button><br><br>
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+    <!-- Add more fields as needed -->
+    <button type="submit">Update User</button>
+</form>
+
+<div id="userInfo"></div>
+<div id="message"></div>
+
+<script>
+document.getElementById("searchButton").addEventListener("click", function(event) {
+    event.preventDefault();
+    const voterId = document.getElementById("voterId").value;
+
+    fetch(`http://127.0.0.1:8000/search-voter/${voterId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("User not found");
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById("name").value = data.name; // Populate name field
+        //document.getElementById("userInfo").innerHTML = `
+            //<p>Voter ID: ${data.voter_Id}</p>
+            //<p>Name: ${data.name}</p>
+            //<p>Status: ${data.status}</p>
+        //`;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("userInfo").innerText = "User not found.";
+    });
+});
+
+document.getElementById("updateForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    const voterId = formData.get("voterId");
+    const name = formData.get("name");
+    // Add more fields as needed
+
+    fetch(`http://127.0.0.1:8000/users/${voterId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name }) // Add more fields as needed
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("message").innerText = data.message;
+        // Optionally, clear the form fields after successful update
+        document.getElementById("updateForm").reset();
+        // Clear user info display
+        document.getElementById("userInfo").innerText = "";
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("message").innerText = "An error occurred while updating user information.";
+    });
+});
+</script>
+
+</body>
+</html>
+

@@ -1,59 +1,19 @@
+<!-- admin_login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <script src="https://unpkg.com/htmx.org@^1.6.0/dist/htmx.min.js"></script>
 </head>
 <body>
-
-<h2>Admin Login</h2>
-
-<form id="loginForm" action="http://127.0.0.1:8000/admin-login" method="POST" hx-target="#result" hx-swap="outerHTML" hx-trigger="submit" onsubmit="return submitForm()">
-    <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username" required><br><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br><br>
-    <button type="submit">Login</button>
-</form>
-
-<div id="result"></div>
-
-<script>
-    // Function to manually submit the form
-    function submitForm() {
-        var form = document.getElementById('loginForm');
-        var formData = new FormData(form);
-
-        // Create a new XMLHttpRequest object
-        var xhr = new XMLHttpRequest();
-        
-        // Open a POST request to the form's action URL
-        xhr.open('POST', form.action);
-
-        // Set the Content-Type header
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        // Define a callback function to handle the response
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                // Handle successful response by redirecting
-                window.location.href = "http://127.0.0.1:5500/templates/admindashboard.html";
-            } else {
-                // Handle error response
-                document.getElementById('result').innerText = 'Invalid credentials. Access denied.';
-            }
-        };
-
-        // Send the form data
-        xhr.send(new URLSearchParams(formData));
-
-        // Prevent the default form submission
-        return false;
-    }
-</script>
-
+    <h1>Admin Login</h1>
+    <form action="http://127.0.0.1:8000/admin-login" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>
-

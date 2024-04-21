@@ -1,20 +1,17 @@
+<!-- admin_dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <script src="https://unpkg.com/htmx.org@^1.6.0/dist/htmx.min.js"></script>
 </head>
 <body>
-
-<h2>Admin Dashboard</h2>
-
-<button hx-get="/search-voter" hx-target="#result">Search Voter</button>
-<button hx-get="/delete-voter" hx-target="#result">Delete Voter</button>
-<button hx-get="/update-voter" hx-target="#result">Update Voter</button>
-
-<div id="result"></div>
-
+    <h1>Admin Dashboard</h1>
+    <a href="http://127.0.0.1:8000/admin/search"><button>Search Voter</button></a>
+    <a href="http://127.0.0.1:8000/admin/update"><button>Update Voter</button></a>
+    <a href="http://127.0.0.1:8000/admin/delete"><button>Delete Voter</button></a>
+    <a href="http://127.0.0.1:8000/admin/count-votes"><button>Count Votes</button></a> <!-- New link/button for count votes page -->
+    <a href="http://127.0.0.1:8000/admin/logout"><button>Logout</button></a>
 </body>
 </html>

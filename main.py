@@ -5,6 +5,7 @@ import cv2
 import os 
 from dotenv import load_dotenv
 import numpy as np
+from pydantic import EmailStr
 from sqlalchemy import func
 from core import create_cors_middleware
 #from fastapi.templating import TemplateResponse
@@ -158,7 +159,7 @@ async def test_post(db: Session = Depends(get_db)):
 
 async def register(
     voter_Id: int = Form(...),
-    username: str = Form(...),
+    username: EmailStr = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
@@ -263,13 +264,13 @@ async def dashboard(
         "status": voting_status,
     }
     return JSONResponse(data)
-@app.get("/logout")
-async def logout(session: Session = Depends(get_db)):
-    session.close()  # Close the session
-    return RedirectResponse(url="/")
-from fastapi.templating import Jinja2Templates
+#@app.get("/logout")
+#async def logout(session: Session = Depends(get_db)):
+ #   session.close()  # Close the session
+  #  return RedirectResponse(url="/")
+#from fastapi.templating import Jinja2Templates
 
-templates = Jinja2Templates(directory="templates")
+#templates = Jinja2Templates(directory="templates")
 
 @app.get("/login", response_class=HTMLResponse)
 async def read_login(request: Request):
@@ -310,7 +311,6 @@ async def get_update_user(voter_id: int, new_data: dict, db: Session = Depends(g
     user_info = {
         "voter_id": user.voter_id,
         "name": user.name,
-        "status": user.status,
         # Add more fields as needed
     }
 
@@ -385,16 +385,94 @@ async def count_votes(db: Session = Depends(get_db)):
         worksheet.append_row([party, count])  # Append party and vote count
 
     return result
-# Admin credentials
+@app.get("/search-voter/{voter_Id}")
+async def search_voter(voter_Id: int, db: Session = Depends(get_db)):
+    # Query the database to search for the voter by their voter ID
+    voter = db.query(Voter).filter(Voter.voter_id == voter_Id).first()
+
+    if voter:
+        # If the voter is found, return their details
+        return {
+            "voter_Id": voter.voter_id,
+            "name": voter.name,
+            "status": "Voted" if voter.status else "Not Voted"
+        }
+    else:
+        # If the voter is not found, raise an HTTPException with a 404 status code
+        raise HTTPException(status_code=404, detail="Voter not found")
+
+
+# Create Jinja2Templates instance
+templates = Jinja2Templates(directory="templates")
+# Define routes
+@app.get("/admin/login", response_class=HTMLResponse)
+async def admin_login(request: Request):
+    return templates.TemplateResponse("adminlogin.html", {"request": request})
+
+#admin credential 
 admin_credentials = {"admin@2024": "401104"}
 
+#@app.post("/admin-login", response_class=HTMLResponse)
+#async def admin_login(username: str = Form(...), password: str = Form(...)):
+ #   if username in admin_credentials and password == admin_credentials[username]:
+  #      # Admin authentication successful
+   #     response = Response(content="Admin login successful. You have access to admin privileges.")
+    #    response.headers["HX-Trigger"] = "result"
+     #   response.headers["HX-Scroll-Target"] = "#result"
+      #  return response
+    #else:
+     #   raise HTTPException(status_code=401, detail="Invalid credentials. Access denied.")
 @app.post("/admin-login", response_class=HTMLResponse)
 async def admin_login(username: str = Form(...), password: str = Form(...)):
     if username in admin_credentials and password == admin_credentials[username]:
-        # Admin authentication successful
-        response = Response(content="Admin login successful. You have access to admin privileges.")
-        response.headers["HX-Trigger"] = "result"
-        response.headers["HX-Scroll-Target"] = "#result"
-        return response
+        # Admin authentication successful, redirect to admin dashboard
+        return RedirectResponse(url="/admin/dashboard", status_code=303)
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials. Access denied.")
+@app.get("/admin/dashboard", response_class=HTMLResponse)
+async def admin_dashboard(request: Request):
+    return templates.TemplateResponse("admindashboard.html", {"request": request})
+
+@app.get("/admin/search", response_class=HTMLResponse)
+async def admin_search(request: Request):
+    return templates.TemplateResponse("search-voter.html", {"request": request})    
+
+# Update voter endpoint
+@app.get("/admin/update", response_class=HTMLResponse)
+async def admin_update(request: Request):
+    return templates.TemplateResponse("update-voter.html", {"request": request})
+
+# Delete voter endpoint
+@app.get("/admin/delete", response_class=HTMLResponse)
+async def admin_delete(request: Request):
+    return templates.TemplateResponse("delete-voter.html", {"request": request})
+@app.post("/search-voter/{voter_Id}")
+async def search_voter(voter_Id: str, db: Session = Depends(get_db)):
+    # Query the database to search for the voter by their voter ID
+    voter = db.query(Voter).filter(Voter.voter_id == voter_Id).first()
+
+    if voter:
+        # If the voter is found, return their details
+        return {
+            "voter_Id": voter.voter_id,
+            "name": voter.name,
+            "status": "Voted" if voter.status else "Not Voted"
+        }
+    else:
+        # If the voter is not found, raise an HTTPException with a 404 status code
+        raise HTTPException(status_code=404, detail="Voter not found")
+@app.get("/admin/logout")
+async def logout():
+    # Here you can implement any logout logic, such as clearing session data, etc.
+    # For simplicity, let's assume logging out just redirects to the login page
+    return RedirectResponse(url="/admin/login", status_code=303)
+@app.get("/admin/count-votes", response_class=HTMLResponse)
+async def count_votes(request: Request, db: Session = Depends(get_db)):
+    # Logic to count votes goes here
+    # For demonstration purposes, let's assume you have a function to count votes
+    total_votes = db.query(models.Voter.voted_party, func.count(models.Voter.voter_id)).filter(models.Voter.voted_party != None).group_by(models.Voter.voted_party).all()
+    
+    # Convert SQLAlchemy Rows to list of dictionaries
+    total_votes_json = [{"voted_party": party, "total_votes": count} for party, count in total_votes]
+    
+    return templates.TemplateResponse("countvote.html", {"request": request, "total_votes": total_votes_json})
