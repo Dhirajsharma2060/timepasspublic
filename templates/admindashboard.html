@@ -1,17 +1,63 @@
-<!-- admin_dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn.logout {
+            background-color: #ff0000; /* Red color for logout button */
+            position: absolute;/* Position the button */
+            color: #fff;
+            top: 10px; /* Distance from the top */
+            right: 10px; /* Distance from the right */
+        }
+    </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
-    <a href="http://127.0.0.1:8000/admin/search"><button>Search Voter</button></a>
-    <a href="http://127.0.0.1:8000/admin/update"><button>Update Voter</button></a>
-    <a href="http://127.0.0.1:8000/admin/delete"><button>Delete Voter</button></a>
-    <a href="http://127.0.0.1:8000/admin/count-votes"><button>Count Votes</button></a> <!-- New link/button for count votes page -->
-    <a href="http://127.0.0.1:8000/admin/logout"><button>Logout</button></a>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <div class="btn-container">
+            <a href="http://127.0.0.1:8000/admin/search" class="btn"><button>Search Voter</button></a>
+            <a href="http://127.0.0.1:8000/admin/update" class="btn"><button>Update Voter</button></a>
+            <a href="http://127.0.0.1:8000/admin/delete" class="btn"> <button>Delete Voter</button></a>
+            <a href="http://127.0.0.1:8000/admin/count-votes" class="btn"><button>Count Votes</button></a>
+        </div>
+        <a href="http://127.0.0.1:8000/admin/logout" class="btn logout"><button>Logout</button></a>
+    </div>
 </body>
 </html>

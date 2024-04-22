@@ -37,8 +37,8 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
       setLoginError('Please fill in all required fields.');
       return;
     }
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(username)) {
-      setLoginError('Username should be valid email ID it should letter,number and @ .');
+    if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(username)) {
+      setLoginError('Username should start with a letter and contain only letters and numbers.');
       return;
     }
     if (password.startsWith('0')) {
@@ -173,7 +173,7 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
             <img src={userIcon} alt="" />
             <input
               type="text"
-              placeholder="Email ID"
+              placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />

@@ -159,7 +159,7 @@ async def test_post(db: Session = Depends(get_db)):
 
 async def register(
     voter_Id: int = Form(...),
-    username: EmailStr = Form(...),
+    username: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
