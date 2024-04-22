@@ -6,7 +6,7 @@ class Voter(Base):
 
 
     voter_id=Column(BigInteger,primary_key=True,nullable=False)
-    name=Column(String,nullable=False)
+    name=Column(String, unique=True, nullable=False)
     password=Column(String,nullable=False)
     status=Column(Boolean,default=False)
     time = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))

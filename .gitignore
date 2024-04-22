@@ -8,3 +8,6 @@ venv/
 .env
 # Ignore imageref folder 
 #imageref/
+#Ingnore the keys files
+#industrious-eye-419611-54257af88d79.json
+credential.json

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 50px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Different font */
+            text-decoration: underline; /* Add underline */
+        }
+        form {
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff; /* White background for form */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+        }
+        label, input {
+            display: block;
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button[type="button"], button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button[type="button"]:hover, button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #userInfo, #message {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Different font */
+            color: #333; /* Text color */
+            display: none; /* Initially hide */
+        }
+        .back-button {
+            display: block;
+            position: absolute;
+            right: 20px;
+            margin: -35px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<button class="back-button" onclick="goBack()">Back</button>
+<h2>Update User Information</h2>
+<!--button class="back-button" onclick="goBack()">Back</button-->
+
+<form id="updateForm">
+    <label for="voterId">Voter ID:</label><br>
+    <input type="text" id="voterId" name="voterId" required><br>
+    <button type="button" id="searchButton">Search</button><br><br>
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+    <!-- Add more fields as needed -->
+    <button type="submit">Update User</button>
+</form>
+
+<div id="userInfo"></div>
+<div id="message"></div>
+
+<script>
+document.getElementById("searchButton").addEventListener("click", function(event) {
+    event.preventDefault();
+    const voterId = document.getElementById("voterId").value;
+
+    fetch(`http://127.0.0.1:8000/search-voter/${voterId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("User not found");
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById("name").value = data.name; // Populate name field
+        document.getElementById("userInfo").innerHTML = `
+            <p>Voter ID: ${data.voter_Id}</p>
+            <p>Name: ${data.name}</p>
+            <p>Status: ${data.status}</p>
+        `;
+        document.getElementById("userInfo").style.display = "block"; // Show user info
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("userInfo").innerText = "User not found.";
+        document.getElementById("userInfo").style.display = "block"; // Show user info with message
+    });
+});
+
+document.getElementById("updateForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    const voterId = formData.get("voterId");
+    const name = formData.get("name");
+    // Add more fields as needed
+
+    fetch(`http://127.0.0.1:8000/users/${voterId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name }) // Add more fields as needed
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("message").innerText = data.message;
+        document.getElementById("message").style.display = "block"; // Show message
+        // Optionally, clear the form fields after successful update
+        document.getElementById("updateForm").reset();
+        // Clear user info display
+        document.getElementById("userInfo").innerText = "";
+        document.getElementById("userInfo").style.display = "none"; // Hide user info after update
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("message").innerText = "An error occurred while updating user information.";
+        document.getElementById("message").style.display = "block"; // Show error message
+    });
+});
+function goBack() {
+    window.location.href = "http://127.0.0.1:8000/admin/dashboard";
+}
+</script>
+
+</body>
+</html>
+

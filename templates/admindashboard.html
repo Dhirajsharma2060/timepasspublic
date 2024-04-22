@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Different font */
+            text-decoration: underline; /* Add underline */
+        }
+        .container {
+            max-width: 800px;
+            margin: 130px auto;
+            padding: 20px;
+            background-color: #fff; /* White background for container */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 22px;
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn.logout {
+            background-color: #ff0000; /* Red color for logout button */
+            position: absolute;/* Position the button */
+            color: #fff;
+            top: 10px; /* Distance from the top */
+            right: 10px; /* Distance from the right */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <div class="btn-container">
+            <a href="http://127.0.0.1:8000/admin/search" class="btn">Search Voter</a>
+            <a href="http://127.0.0.1:8000/admin/update" class="btn">Update Voter</a>
+            <a href="http://127.0.0.1:8000/admin/delete" class="btn"> Delete Voter</a>
+            <a href="http://127.0.0.1:8000/admin/count-votes" class="btn">Count Votes</a>
+        </div>
+        <a href="http://127.0.0.1:8000/admin/logout" class="btn logout">Logout</a>
+    </div>
+</body>
+</html>

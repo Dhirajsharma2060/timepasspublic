@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 50px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Different font */
+            text-decoration: underline; /* Add underline */
+        }
+        .error {
+            color: red;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff; /* White background for form */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+        }
+        label, input, button {
+            display: block;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 12px;
+            background-color: #dc3545; /* Red color for delete button */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+        #message {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-button {
+            display: block;
+            position: absolute;
+            right: 20px;
+            margin: -46px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<button class="back-button" onclick="goBack()">Back</button>    
+
+<h2>Delete User</h2>
+
+<form id="deleteForm">
+    <label for="voterId">Enter Voter ID:</label>
+    <input type="text" id="voterId" name="voterId" required>
+    <span id="deleteError" class="error"></span>
+    <button type="button" id="deleteButton">Delete User</button>
+</form>
+
+<div id="message"></div>
+
+<script>
+document.getElementById("deleteButton").addEventListener("click", function(event) {
+    event.preventDefault();
+    const voterId = document.getElementById("voterId").value;
+
+    // Confirm deletion
+    const confirmDelete = confirm("Are you sure you want to delete this user?");
+    if (!confirmDelete) {
+        return; // Do nothing if user cancels deletion
+    }
+
+    fetch(`http://127.0.0.1:8000/users/${voterId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            document.getElementById("deleteError").innerText = "Error: User not found or already deleted";
+            throw new Error("User not found or already deleted");
+        } else {
+            document.getElementById("deleteError").innerText = ""; // Clear any previous error message
+            return response.json();
+        }
+    })
+    .then(data => {
+        document.getElementById("message").innerText = data.message;
+        // Optionally, clear the form field after successful deletion
+        document.getElementById("deleteForm").reset();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("message").innerText = "An error occurred while deleting the user.";
+    });
+});
+function goBack(){
+    window.location.href="http://127.0.0.1:8000/admin/dashboard";
+}
+</script>
+
+</body>
+</html>

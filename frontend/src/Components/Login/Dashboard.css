@@ -123,3 +123,79 @@
   height: 2px; /* Line thickness */
   background-color: black;
 }
+/* Separator styles */
+.separator {
+  width: 100%;
+  height: 2px;
+  background-color: rgb(108, 46, 46);
+  margin: 10px 0;
+}
+
+.party-separator {
+  width: 100%; /* Span the full width */
+  height: 2px; /* Line thickness */
+  background-color: black; /* Dark red color (same as your separator) */
+  margin: 10px 0; /* Spacing above and below (same as your separator) */
+}
+
+.user-separator {
+  width: 100%; /* Span the full width */
+  height: 2px; /* Line thickness */
+  background-color: black;
+  margin: 10px 0; /* Spacing above and below */
+}
+
+/* New styles for responsive design */
+
+@media screen and (max-width: 768px) {
+  .dashboard-title {
+    font-size: 8vw; /* Adjust font size for smaller screens */
+  }
+
+  .image-container img {
+    width: 70%; /* Adjust image width for smaller screens */
+  }
+
+  .user-info-container,
+  .parties-list-container {
+    position: static; /* Remove absolute positioning for smaller screens */
+    width: auto; /* Set width to auto */
+    margin-top: 20px; /* Add margin at the top */
+  }
+
+  .parties-list-container {
+    width: 100%; /* Occupy full width on smaller screens */
+  }
+
+  .logout-button,
+  .vote-button {
+    width: 100%; /* Make buttons occupy full width */
+  }
+
+  .logout-button,
+  .vote-button,
+  .party-item {
+    padding: 10px; /* Adjust button padding */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .dashboard-title {
+    font-size: 10vw; /* Further adjust font size for smaller screens */
+  }
+
+  .image-container img {
+    width: 100%; /* Occupy full width for smaller screens */
+  }
+
+  .user-info,
+  .parties-list {
+    font-size: 1.2rem; /* Adjust font size */
+  }
+
+  .logout-button,
+  .vote-button,
+  .party-item {
+    padding: 8px; /* Further adjust button padding */
+  }
+}

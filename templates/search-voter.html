@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Voter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 50px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Different font */
+            text-decoration: underline; /* Add underline */
+        }
+        form {
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff; /* White background for form */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+        }
+        label, input {
+            display: block;
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #searchResult {
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            color: #333;
+            font-size: 21px;
+        }
+        .back-button {
+            display: block;
+            position: absolute;
+            right: 20px;
+            margin: -35px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<button class="back-button" onclick="goBack()">Back</button>    
+
+<h2>Search Voter</h2>
+
+<form id="searchForm">
+    <label for="voterId">Voter ID:</label><br>
+    <input type="text" id="voterId" name="voterId" required><br><br>
+    <button type="submit">Search</button>
+</form>
+
+<div id="searchResult"></div>
+
+<script>
+    const form = document.getElementById("searchForm");
+    const searchResult = document.getElementById("searchResult");
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        
+        const voterId = document.getElementById("voterId").value;
+        const url = `http://127.0.0.1:8000/search-voter/${voterId}`;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST"
+            });
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok.");
+            }
+
+            const data = await response.json();
+            displayResult(data);
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    });
+
+    function displayResult(data) {
+        searchResult.style.display = "block"; // Show the search result
+        searchResult.innerHTML = `
+            <h3>Voter ID: ${data.voter_Id}</h3>
+            <p>Name: ${data.name}</p>
+            <p>Status: ${data.status}</p>
+        `;
+    }
+function goBack(){
+    window.location.href="http://127.0.0.1:8000/admin/dashboard";
+}
+</script>
+
+</body>
+</html>

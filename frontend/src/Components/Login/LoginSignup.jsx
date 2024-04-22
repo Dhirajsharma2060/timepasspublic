@@ -30,7 +30,23 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
     setShowConfirmation(false); // Hide confirmation dialog
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Validation logic for signup
+    if (!voter_Id || !username || !password) {
+      setLoginError('Please fill in all required fields.');
+      return;
+    }
+    if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(username)) {
+      setLoginError('Username should start with a letter and contain only letters and numbers.');
+      return;
+    }
+    if (password.startsWith('0')) {
+      setLoginError('Password should not start with zero.');
+      return;
+    }
+    // Submit logic for signup
+    
     try {
       const response = await fetch('http://127.0.0.1:8000/register', {
         method: 'POST',
@@ -53,6 +69,11 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
 
   const handleLogin = async () => {
     try {
+      // Validation for login
+      if (!voter_Id || !password) {
+        setLoginError('Please fill in Voter ID and password.');
+        return;
+      }
       const response = await fetch('http://127.0.0.1:8000/login', {
         method: 'POST',
         headers: {
@@ -62,21 +83,25 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
       });
 
       if (!response.ok) {
-        // Handle HTTP errors
-        const errorData = await response.json(); // Assuming the backend sends JSON error messages
+      // Handle HTTP errors
+      const errorData = await response.json();
+      if (errorData.message === 'Voter not found') {
+        setLoginError('Voter not found. Please check your Voter ID.');
+      } else {
         throw new Error(errorData.message || 'Login failed.');
       }
-
+    } else {
       const responseData = await response.json();
       console.log('Response data:', responseData);
 
       setLoginResponse(responseData); // Store the login response in state
       onRedirectToDashboard(responseData); // Pass the login response to Dashboard
-    } catch (error) {
-      console.error('Error during login:', error);
-      setLoginError(error.message);
     }
-  };
+  } catch (error) {
+    console.error('Error during login:', error);
+    setLoginError(error.message || 'An error occurred during login.');
+  }
+};
 
   const handleForgetPasswordClick = () => {
     setShowConfirmation(true);
@@ -135,11 +160,11 @@ const LoginSignup = ({ onRedirectToDashboard }) => {
       </div>
 
       {signupSuccess && (
-        <div className="success-message">Signup successful! You can now login.</div>
+        <div className="success-message" style={{color:'green'}}>Signup successful! You can now login.</div>
       )}
 
       {loginError && (
-        <div className="error-message">{loginError}</div>
+        <div className="error-message" style={{color:'red'}}>{loginError}</div>
       )}
 
       <div className="inputs">
