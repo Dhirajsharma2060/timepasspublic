@@ -1,10 +1,49 @@
 <!-- admin_login.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en">   
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
+    <style>
+        body {
+            /*background-image: url("D:\timepass\timepasspublic-main\timepasspublic-main\templates\login-backgorund.jpg");*/
+            background-size: cover;
+            background-position: center;
+            /*filter: blur(5px);  Optional: Apply a blur effect */
+            font-size: 18px; /* Increase the font size */
+        }
+        h1 {
+            text-align: center;
+            color: #3c009d; /* Highlight color for the title */
+            font-size: 39px; /* Adjust the font size as needed */
+            margin-top: 53px; /* Add margin to push the title down */
+            text-decoration: underline; /* Add underline */
+        }
+        form {
+            width: 300px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Optional: Box shadow for styling */
+        }
+        label, input {
+            display: block;
+            margin-bottom: 15px;
+            font-family: Arial, sans-serif; /* Change the font family for labels */
+            font-weight: bold; /* Make labels bold */
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3c009d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <h1>Admin Login</h1>
@@ -15,5 +54,32 @@
         <input type="password" id="password" name="password" required><br><br>
         <button type="submit">Login</button>
     </form>
+    <script>
+        function validateForm() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const usernameError = document.getElementById('username-error');
+            const passwordError = document.getElementById('password-error');
+            let isValid = true;
+
+            // Reset error messages
+            usernameError.textContent = '';
+            passwordError.textContent = '';
+
+            // Validate username
+            if (username.trim() === '') {
+                usernameError.textContent = 'Username is required.';
+                isValid = false;
+            }
+
+            // Validate password
+            if (password.trim() === '') {
+                passwordError.textContent = 'Password is required.';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+    </script>
 </body>
 </html>
