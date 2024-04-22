@@ -61,9 +61,25 @@
             color: #333;
             font-size: 21px;
         }
+        .back-button {
+            display: block;
+            position: absolute;
+            right: 20px;
+            margin: -35px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
+<button class="back-button" onclick="goBack()">Back</button>    
 
 <h2>Search Voter</h2>
 
@@ -109,6 +125,9 @@
             <p>Status: ${data.status}</p>
         `;
     }
+function goBack(){
+    window.location.href="http://127.0.0.1:8000/admin/dashboard";
+}
 </script>
 
 </body>
