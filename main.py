@@ -137,10 +137,10 @@ def recognize_face(voter_Id: str):
 
 def is_valid_voter_Id(voter_Id: int) -> bool:
     return len(str(voter_Id)) == 10
-@app.get("/")
-async def landing():
-  print("Welcome !!!! the backend ")  
-  return{"Welcome"}
+#@app.get("/")
+#async def landing():
+#  print("Welcome !!!! the backend ")  
+#  return{"Welcome"}
 @app.get("/register")
 async def get_data(db: Session = Depends(get_db)):
     #cursor.execute("""
@@ -405,13 +405,21 @@ async def search_voter(voter_Id: int, db: Session = Depends(get_db)):
 # Create Jinja2Templates instance
 templates = Jinja2Templates(directory="templates")
 # Define routes
+@app.get("/")
+async def landing(request:Request):
+  #print("Welcome !!!! the backend ")  
+  #return{"Welcome"}
+  return templates.TemplateResponse("adminlogin.html",{"request":request})
 @app.get("/admin/login", response_class=HTMLResponse)
 async def admin_login(request: Request):
     return templates.TemplateResponse("adminlogin.html", {"request": request})
 
 #admin credential 
-admin_credentials = {"admin@2024": "401104"}
-
+#admin_credentials = {"admin@2024": "401104"}
+# Get admin credentials from environment variables
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+admin_credentials={os.getenv("ADMIN_USERNAME"):os.getenv("ADMIN_PASSWORD")}
 #@app.post("/admin-login", response_class=HTMLResponse)
 #async def admin_login(username: str = Form(...), password: str = Form(...)):
  #   if username in admin_credentials and password == admin_credentials[username]:
