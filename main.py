@@ -1,13 +1,10 @@
-from re import template
-from fastapi import Depends, FastAPI, Form, HTTPException, Request, Response, WebSocket, WebSocketDisconnect, requests
+from fastapi import Depends, FastAPI, Form, HTTPException, Request
 import face_recognition
 import cv2
 import os 
 from dotenv import load_dotenv
 import numpy as np
-from pydantic import EmailStr
 from sqlalchemy import func
-from core import create_cors_middleware
 #from fastapi.templating import TemplateResponse
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
@@ -19,8 +16,8 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from models import Voter
 from connect import connect
-from fastapi import FastAPI, Depends, WebSocket
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi import FastAPI, Depends
+from fastapi.responses import HTMLResponse, RedirectResponse
 #from websocket_manager import WebSocketManager
 import models
 import core
