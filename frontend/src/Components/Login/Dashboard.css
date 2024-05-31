@@ -54,12 +54,14 @@
 
 .parties-list-container {
   display: flex;
+  background-color: #fff;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   position: absolute;
   width: 34%;
   padding: 5px;
+  height: 400px;
   top: 30%;
 }
 
@@ -69,15 +71,21 @@
 }
 
 /* Styles for buttons */
-.logout-button,
-.vote-button {
-  padding: 8px 16px;
+.logout-button{
+  padding: 13px 49px;
   border: none;
-  border-radius: 5px;
+  border-radius: 13px;
   cursor: pointer;
-  margin-bottom: 10px; /* Add space between vote buttons */
+  margin-bottom: 18px; /* Add space between vote buttons */
 }
-
+.vote-button {
+  padding: 13px 49px;
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  margin-bottom: 18px; /* Add space between vote buttons */
+  width: 100%;
+}
 .logout-button {
   background-color: red; /* Red color for logout button */
   color: white;
@@ -132,7 +140,7 @@
 }
 
 .party-separator {
-  width: 100%; /* Span the full width */
+  width: 70%; /* Span the full width */
   height: 2px; /* Line thickness */
   background-color: black; /* Dark red color (same as your separator) */
   margin: 10px 0; /* Spacing above and below (same as your separator) */
