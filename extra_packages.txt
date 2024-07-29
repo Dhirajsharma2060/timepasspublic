@@ -1,0 +1,8 @@
+ ```plaintext
+ # Install dlib from the .whl file
+
+ # Ensure you have the dlib wheel file in the 'packages/' directory
+ # Replace 'path/to/' with the actual path to the wheel file
+ 
+ pip install packages/dlib-19.24.1-cp311-cp311-win_amd64.whl
+ ```
