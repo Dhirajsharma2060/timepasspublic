@@ -161,6 +161,7 @@ async def register(
     db: Session = Depends(get_db)
 ):
    
+   
     # Check if the voter_Id is already taken (you should implement this function)
     if is_voter_Id_taken(voter_Id,db):
         raise HTTPException(status_code=400, detail="voter_Id already taken")
